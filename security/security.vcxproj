@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="identity.h" />
+    <ClInclude Include="overloads.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
