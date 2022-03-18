@@ -7,6 +7,6 @@
 #include <security.h>
 
 // C++ Headers
+#include <functional>
 #include <optional>
 #include <string>
-#include <functional>

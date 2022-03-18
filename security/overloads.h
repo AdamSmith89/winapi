@@ -1,6 +1,6 @@
 #pragma once
 
-namespace security::identity
+namespace winapi::security::identity
 {
     template<typename char_type>
     struct overloads;
