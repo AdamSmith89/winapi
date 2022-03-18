@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "security/identity.h"
+#include "utility/Handle.h"
 #include "winerror/Error.h"
 
 using namespace winapi;
@@ -10,10 +11,6 @@ int main()
 {
     using namespace security::identity;
 
-    auto usernameA = GetUserName_Ex(ExtendedNameFormat::UserPrincipal);
-    auto error = winerror::GetLastError();
-    if (error.Failed())
-    {
-        auto errorStr = error.AsString();
-    }
+    auto processHandle = Handle(GetCurrentProcessToken());
+    auto tokenUser = GetTokenInformation<TOKEN_TYPE>(processHandle, TokenInformationClass::Type);
 }

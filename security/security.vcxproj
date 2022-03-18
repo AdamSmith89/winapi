@@ -173,6 +173,11 @@
     </ClCompile>
     <ClCompile Include="identity.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\winerror\winerror.vcxproj">
+      <Project>{70bdb4ca-5f77-4856-aed9-e2c7534d704c}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

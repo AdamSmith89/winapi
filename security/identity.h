@@ -2,7 +2,9 @@
 
 #include "defines.h"
 #include "overloads.h"
+
 #include "utility/Handle.h"
+#include "winerror/Error.h"
 
 namespace winapi::security::identity
 {
@@ -35,6 +37,28 @@ namespace winapi::security::identity
             if (overloads<char_type>::Get_UserNameEx()(static_cast<EXTENDED_NAME_FORMAT>(format), name.data(), &size))
             {
                 return name;
+            }
+        }
+
+        return {};
+    }
+
+    template<typename TokenInformationType>
+    std::optional<TokenInformationType> GetTokenInformation(Handle const& handle, TokenInformationClass const type)
+    {
+        std::unique_ptr<TokenInformationType> pTokenInfo = nullptr;
+        DWORD sizeRequired = 0;
+
+        bool result = ::GetTokenInformation(handle.Get(), static_cast<TOKEN_INFORMATION_CLASS>(type), nullptr, 0, &sizeRequired);
+
+        if (!result && winerror::GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+        {
+            void* pRaw = operator new(sizeRequired);
+            if (::GetTokenInformation(handle.Get(), static_cast<TOKEN_INFORMATION_CLASS>(type), pRaw, sizeRequired, &sizeRequired))
+            {
+                pTokenInfo.reset(static_cast<TokenInformationType*>(pRaw));
+                TokenInformationType tokenInfo = *pTokenInfo.release();
+                return { tokenInfo };
             }
         }
 

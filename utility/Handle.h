@@ -35,6 +35,8 @@ namespace winapi
             }
         }
 
+        HANDLE Get() const { return m_rawHandle; }
+
     private:
         HANDLE m_rawHandle = nullptr;
     };

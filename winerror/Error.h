@@ -12,7 +12,13 @@ namespace winapi::winerror
         {
         }
 
+        bool operator==(DWORD const rhs) const
+        {
+            return m_errorCode == rhs;
+        }
+
         DWORD Code() const { return m_errorCode; }
+
         template<typename char_type=char>
         std::optional<std::basic_string<char_type>> AsString() const
         {
