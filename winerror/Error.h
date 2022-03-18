@@ -12,7 +12,7 @@ namespace winapi::winerror
         {
         }
 
-        DWORD Value() const { return m_errorCode; }
+        DWORD Code() const { return m_errorCode; }
         template<typename char_type=char>
         std::optional<std::basic_string<char_type>> AsString() const
         {
