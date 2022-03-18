@@ -22,5 +22,27 @@ namespace security::identity
     };
 
     // Using _ to avoid collision with Windows macro
-    std::optional<winapi::Handle> Logon_User(std::string const& username, std::optional<std::string> const& domain, std::optional<std::string> const& password, LogonType const type, LogonProvider const provider);
+    template<typename char_type>
+    std::optional<winapi::Handle> Logon_User(char_type const* username, char_type const* domain, char_type const* password, LogonType const type, LogonProvider const provider)
+    {
+        HANDLE phToken = nullptr;
+        if constexpr (std::is_same<char_type, char>::value)
+        {
+            if (::LogonUserA(username, domain, password, static_cast<DWORD>(type), static_cast<DWORD>(provider), &phToken))
+            {
+                return { winapi::Handle(phToken) };
+            }
+        }
+        else if constexpr (std::is_same<char_type, wchar_t>::value)
+        {
+            if (::LogonUserW(username, domain, password, static_cast<DWORD>(type), static_cast<DWORD>(provider), &phToken))
+            {
+                return { winapi::Handle(phToken) };
+            }
+        }
+
+        return {};
+    }
+
+
 }
