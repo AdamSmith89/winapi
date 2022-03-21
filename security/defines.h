@@ -50,9 +50,9 @@ namespace winapi::security::identity
         RestrictedSids = TokenRestrictedSids,
         SessionId = TokenSessionId,
         GroupsAndPrivileges = TokenGroupsAndPrivileges,
-        SessionReference = TokenSessionReference,
+        SessionReference = TokenSessionReference,   /* Reserved */
         SandBoxInert = TokenSandBoxInert,
-        AuditPolicy = TokenAuditPolicy,
+        AuditPolicy = TokenAuditPolicy,             /* Reserved */
         Origin = TokenOrigin,
         ElevationType = TokenElevationType,
         LinkedToken = TokenLinkedToken,
