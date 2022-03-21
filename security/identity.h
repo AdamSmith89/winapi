@@ -21,21 +21,19 @@ namespace winapi::security::identity
         return {};
     }
 
-    template<typename TokenInformationType>
-    std::optional<TokenInformationType> GetTokenInformation(Handle const& handle, TokenInformationClass const type)
+    template<typename TOKEN_INFO_TYPE>
+    std::optional<TOKEN_INFO_TYPE> GetTokenInformation(Handle const& handle, TokenInformationClass const type)
     {
-        std::unique_ptr<TokenInformationType> pTokenInfo = nullptr;
         DWORD sizeRequired = 0;
 
         bool result = ::GetTokenInformation(handle.Get(), static_cast<TOKEN_INFORMATION_CLASS>(type), nullptr, 0, &sizeRequired);
 
         if (!result && winerror::GetLastError() == ERROR_INSUFFICIENT_BUFFER)
         {
-            void* pRaw = operator new(sizeRequired);
-            if (::GetTokenInformation(handle.Get(), static_cast<TOKEN_INFORMATION_CLASS>(type), pRaw, sizeRequired, &sizeRequired))
+            std::unique_ptr<BYTE[]> pByteArray = std::make_unique<BYTE[]>(sizeRequired);
+            if (::GetTokenInformation(handle.Get(), static_cast<TOKEN_INFORMATION_CLASS>(type), pByteArray.get(), sizeRequired, &sizeRequired))
             {
-                pTokenInfo.reset(static_cast<TokenInformationType*>(pRaw));
-                TokenInformationType tokenInfo = *pTokenInfo.release();
+                TOKEN_INFO_TYPE tokenInfo = *reinterpret_cast<TOKEN_INFO_TYPE*>(pByteArray.get());
                 return { tokenInfo };
             }
         }
