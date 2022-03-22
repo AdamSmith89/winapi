@@ -1,7 +1,13 @@
 #pragma once
 
-namespace winapi::security::identity
+namespace winapi::security
 {
+    enum class ACLRevision
+    {
+        Revision = ACL_REVISION,
+        Revision_DS = ACL_REVISION_DS
+    };
+
     enum class ExtendedNameFormat
     {
         Unknown = NameUnknown,                      // An unknown name type.

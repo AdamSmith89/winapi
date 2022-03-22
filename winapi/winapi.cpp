@@ -15,5 +15,4 @@ int main()
     auto tokenUser = GetTokenInformation<TokenInformationClass::User>(processHandle);
     auto tokenType = GetTokenInformation<TokenInformationClass::Type>(processHandle);
     auto tokenGroups = GetTokenInformation<TokenInformationClass::Groups>(processHandle);
-    //auto tokenGroups = GetTokenInformation<TokenInformationClass::SessionReference>(processHandle);
 }

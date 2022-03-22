@@ -27,12 +27,24 @@
     <ClInclude Include="defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="security.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dacl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="identity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="security.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dacl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

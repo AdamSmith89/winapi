@@ -2,6 +2,6 @@
 
 #include "identity.h"
 
-namespace security::identity
+namespace winapi::security::identity
 {
 }
