@@ -13,11 +13,9 @@ namespace winapi::security
     class DaclBuilder
     {
     public:
-        DaclBuilder AddAccessAllowedAce(ACLRevision const revision)
-        {
-            auto x = access_rights::File::AppendData;
-            x ^= access_rights::Directory::AddFile;
-        }
-        //Dacl Build();
+        static DaclBuilder Create() { return DaclBuilder(); }
+        Dacl Build();
+
+        DaclBuilder AddAccessAllowedAce(access_rights::Standard const accessMask, PSID pSid, ACLRevision const revision = ACLRevision::Revision);
     };
 }
