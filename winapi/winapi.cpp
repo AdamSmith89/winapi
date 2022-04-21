@@ -26,6 +26,7 @@ int main(int argc, char** argv)
         context.setOption("duration", true);
         context.setOption("no-intro", true);
         context.setOption("no-breaks", true);
+        context.addFilter("order-by", "suite");
     }
 
     int res = context.run();
@@ -47,6 +48,6 @@ int main(int argc, char** argv)
     auto userToken = Logon_User("username"sv, { "domain"sv }, std::make_optional("password"sv), LogonType::Interactive, LogonProvider::Default);
 
     auto dacl = DaclBuilder::Create()
-        .AddAccessAllowedAce(access_rights::Standard::All, nullptr)
+        .AllowAccessFor(access_rights::Standard::All, nullptr)
         .Build();
 }
