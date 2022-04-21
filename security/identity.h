@@ -11,43 +11,26 @@ namespace winapi::security::identity
     // Using _ to avoid collision with Windows macro
     
     /// <summary>
-    /// The LogonUser function attempts to log a user on to the local computer. The local computer is the computer from which LogonUser was called. You cannot use LogonUser to log on to a remote computer. You specify the user with a user name and domain and authenticate the user with a plaintext password. If the function succeeds, you receive a handle to a token that represents the logged-on user. You can then use this token handle to impersonate the specified user or, in most cases, to create a process that runs in the context of the specified user.
+    /// Attempts to log a user on to the local computer. The local computer is the computer from which LogonUser was called. You cannot use LogonUser to log on to a remote computer. You specify the user with a user name and domain and authenticate the user with a plaintext password. If the function succeeds, you receive a handle to a token that represents the logged-on user. You can then use this token handle to impersonate the specified user or, in most cases, to create a process that runs in the context of the specified user.
     /// Using _ to avoid collision with Windows macro.
     /// </summary>
     /// <typeparam name="char_type">Character type of return value. Defaults to <c>char</c></typeparam>
-    /// <param name="username">- A pointer to a null-terminated string that specifies the name of the user. This is the name of the user account to log on to. If you use the user principal name (UPN) format, User@DNSDomainName, the lpszDomain parameter must be NULL.</param>
-    /// <param name="domain">- A pointer to a null-terminated string that specifies the name of the domain or server whose account database contains the lpszUsername account. If this parameter is NULL, the user name must be specified in UPN format. If this parameter is ".", the function validates the account by using only the local account database.</param>
-    /// <param name="password">- A pointer to a null-terminated string that specifies the plaintext password for the user account specified by username. When you have finished using the password, clear the password from memory by calling the SecureZeroMemory function.</param>
+    /// <param name="username">- Specifies the name of the user. This is the name of the user account to log on to. If you use the user principal name (UPN) format, User@DNSDomainName, the lpszDomain parameter must be NULL.</param>
+    /// <param name="domain">- Optionally specifies the name of the domain or server whose account database contains the username account. If this parameter is NULL, the user name must be specified in UPN format. If this parameter is ".", the function validates the account by using only the local account database.</param>
+    /// <param name="password">- Optionally specifies the plaintext password for the user account specified by username. When you have finished using the password, clear the password from memory by calling the SecureZeroMemory function.</param>
     /// <param name="type">- The type of logon operation to perform.</param>
     /// <param name="provider">- Specifies the logon provider.</param>
     /// <returns>Handle to a token that represents the specified user if successful. std::nullopt if not.</returns>
+    /// <remarks>Requires linking against Advapi32.lib</remarks>
     template<typename char_type=char>
-    std::optional<winapi::Handle> Logon_User(char_type const* username, char_type const* domain, char_type const* password, LogonType const type, LogonProvider const provider)
+    std::optional<winapi::Handle> Logon_User(std::basic_string_view<char_type> const username, std::optional<std::basic_string_view<char_type>> const domain, std::optional<std::basic_string_view<char_type>> const password, LogonType const type, LogonProvider const provider)
     {
         HANDLE phToken = nullptr;
-        if (overloads<char_type>::Logon_User()(username, domain, password, static_cast<DWORD>(type), static_cast<DWORD>(provider), &phToken))
+        char_type const* pDomain = domain ? domain->data() : nullptr;
+        char_type const* pPassword = password ? password->data() : nullptr;
+        if (overloads<char_type>::Logon_User()(username.data(), pDomain, pPassword, static_cast<DWORD>(type), static_cast<DWORD>(provider), &phToken))
         {
             return winapi::Handle(phToken);
-        }
-
-        return {};
-    }
-
-    template<typename TOKEN_INFO_TYPE>
-    std::optional<TOKEN_INFO_TYPE> GetTokenInformation(Handle const& handle, TokenInformationClass const type)
-    {
-        DWORD sizeRequired = 0;
-
-        bool result = ::GetTokenInformation(handle.Get(), static_cast<TOKEN_INFORMATION_CLASS>(type), nullptr, 0, &sizeRequired);
-
-        if (!result && winerror::GetLastError() == ERROR_INSUFFICIENT_BUFFER)
-        {
-            std::unique_ptr<BYTE[]> pByteArray = std::make_unique<BYTE[]>(sizeRequired);
-            if (::GetTokenInformation(handle.Get(), static_cast<TOKEN_INFORMATION_CLASS>(type), pByteArray.get(), sizeRequired, &sizeRequired))
-            {
-                TOKEN_INFO_TYPE tokenInfo = *reinterpret_cast<TOKEN_INFO_TYPE*>(pByteArray.get());
-                return { tokenInfo };
-            }
         }
 
         return {};
@@ -105,10 +88,31 @@ namespace winapi::security::identity
     template<auto T> struct TOKEN_INFO_TYPE<T, typename std::enable_if_t<T == TokenInformationClass::IsLessPrivilegedAppContainer>> { /* reserved */ };
 #pragma endregion
 
+    /// <summary>
+    /// Retrieves a specified type of information about an access token. The calling process must have appropriate access rights to obtain the information.
+    /// </summary>
+    /// <typeparam name="TokenInformationClass">Specifies the type of information the function retrieves.</typeparam>
+    /// <param name="handle">A handle to an access token from which information is retrieved. If TokenInformationClass specifies Source, the handle must have TOKEN_QUERY_SOURCE access. For all other TokenInformationClass values, the handle must have TOKEN_QUERY access.</param>
+    /// <returns>Structure that represents requested data, whose type is derived from the TokenInformationClass template parameter, if successful. std::nullopt if not.</returns>
+    /// <remarks>Requires linking against Advapi32.lib</remarks>
     template<TokenInformationClass T>
     std::optional<typename TOKEN_INFO_TYPE<T>::type> GetTokenInformation(Handle const& handle)
     {
-        return GetTokenInformation<TOKEN_INFO_TYPE<T>::type>(handle, T);
+        DWORD sizeRequired = 0;
+
+        bool result = ::GetTokenInformation(handle.Get(), static_cast<TOKEN_INFORMATION_CLASS>(T), nullptr, 0, &sizeRequired);
+
+        if (!result && winerror::GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+        {
+            std::unique_ptr<BYTE[]> pByteArray = std::make_unique<BYTE[]>(sizeRequired);
+            if (::GetTokenInformation(handle.Get(), static_cast<TOKEN_INFORMATION_CLASS>(T), pByteArray.get(), sizeRequired, &sizeRequired))
+            {
+                auto tokenInfo = *reinterpret_cast<TOKEN_INFO_TYPE<T>::type*>(pByteArray.get());
+                return { tokenInfo };
+            }
+        }
+
+        return {};
     }
 
     /// <summary>
@@ -119,7 +123,7 @@ namespace winapi::security::identity
     /// <typeparam name="char_type">Character type of return value. Defaults to <c>char</c></typeparam>
     /// <param name="format"> - The format of the name. It cannot be Unknown. If the user account is not in a domain, only SamCompatible is supported.</param>
     /// <returns>User name if successful. std::nullopt if not.</returns>
-    /// <remarks>Requires linking against "Secur32.lib"</remarks>
+    /// <remarks>Requires linking against Secur32.lib</remarks>
     template<typename char_type=char>
     std::optional<std::basic_string<char_type>> GetUserName_Ex(ExtendedNameFormat const format)
     {
