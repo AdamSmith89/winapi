@@ -3,7 +3,6 @@
 
 #include <doctest/doctest.h>
 
-
 namespace winapi::security
 {
     DaclBuilder DaclBuilder::AddAccessAllowedAce(access_rights::Standard const accessMask, PSID pSid, ACLRevision const revision/* = ACLRevision::Revision*/)

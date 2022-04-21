@@ -13,7 +13,21 @@ int main(int argc, char** argv)
 {
     // Tests will only run in debug builds
     // For doctest arguments refer to https://github.com/doctest/doctest/blob/master/doc/markdown/commandline.md
-    doctest::Context context(argc, argv);
+    doctest::Context context;
+
+    if (argc > 1)
+    {
+        context.applyCommandLine(argc, argv);
+    }
+    else
+    {
+        // Preferred options to use by default
+        context.setOption("success", true);
+        context.setOption("duration", true);
+        context.setOption("no-intro", true);
+        context.setOption("no-breaks", true);
+    }
+
     int res = context.run();
 
     if (context.shouldExit()) // important - query flags (and --exit) rely on the user doing this
