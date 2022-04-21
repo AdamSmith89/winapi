@@ -4,8 +4,8 @@ namespace winapi::security
 {
     enum class ACLRevision
     {
-        Revision = ACL_REVISION,
-        Revision_DS = ACL_REVISION_DS
+        Revision = ACL_REVISION,        // This is the *current* ACL revision.
+        Revision_DS = ACL_REVISION_DS   // Use ACL_REVISION_DS if the ACL contains object-specific ACEs.
     };
 
     namespace identity
