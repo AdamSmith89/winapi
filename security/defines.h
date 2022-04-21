@@ -8,22 +8,6 @@ namespace winapi::security
         Revision_DS = ACL_REVISION_DS
     };
 
-    enum class ExtendedNameFormat
-    {
-        Unknown = NameUnknown,                      // An unknown name type.
-        FullyQualifiedDN = NameFullyQualifiedDN,    // The fully qualified distinguished name (for example, CN=Jeff Smith,OU=Users,DC=Engineering,DC=Microsoft,DC=Com).
-        SamCompatible = NameSamCompatible,
-        Display = NameDisplay,
-        UniqueId = NameUniqueId,
-        Canonical = NameCanonical,
-        UserPrincipal = NameUserPrincipal,
-        CanonicalEx = NameCanonicalEx,
-        ServicePrincipal = NameServicePrincipal,
-        DnsDomain = NameDnsDomain,
-        GivenName = NameGivenName,
-        Surname = NameSurname
-    };
-
     enum class LogonProvider
     {
         Default = LOGON32_PROVIDER_DEFAULT, // Use the standard logon provider for the system.
@@ -43,6 +27,22 @@ namespace winapi::security
 
     namespace identity
     {
+        enum class ExtendedNameFormat
+        {
+            Unknown = NameUnknown,                      // An unknown name type.
+            FullyQualifiedDN = NameFullyQualifiedDN,    // The fully qualified distinguished name (for example, CN=Jeff Smith,OU=Users,DC=Engineering,DC=Microsoft,DC=Com).
+            SamCompatible = NameSamCompatible,
+            Display = NameDisplay,
+            UniqueId = NameUniqueId,
+            Canonical = NameCanonical,
+            UserPrincipal = NameUserPrincipal,
+            CanonicalEx = NameCanonicalEx,
+            ServicePrincipal = NameServicePrincipal,
+            DnsDomain = NameDnsDomain,
+            GivenName = NameGivenName,
+            Surname = NameSurname
+        };
+
         enum class TokenInformationClass
         {
             User = TokenUser,
